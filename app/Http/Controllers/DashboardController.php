@@ -45,7 +45,33 @@ class DashboardController extends Controller
             $todo->delete();
             return redirect()->route('dashboard')->with('success', 'A To-Do elem sikeresen törölve lett.');
         } else {
-            return redirect()->route('dashboard')->with('error', 'Nem törölhető! A Todo státusza nem engedi a törlést.');
+            return redirect()->route('dashboard')->with('error', 'Nem törölhető! Csak Befejezett és Elhalasztott státuszú To-Dok törölhetőek!');
         }
+    }
+
+    public function filter(Request $request)
+    {
+        $query = Todo::query();
+
+        $category = $request->input('category');
+        if ($category !== null) {
+            $query->where('category', $category);
+        }
+
+        $priority = $request->input('priority');
+        if ($priority !== null) {
+            $query->where('priority', $priority);
+        }
+
+        $date = $request->input('start_date');
+        if ($date !== null) {
+            $query->where('start_date', '>=', $date);
+        }
+
+        $filteredTodos = $query->get();
+
+        return response()->json([
+            'filteredTodos' => $filteredTodos,
+        ]);
     }
 }

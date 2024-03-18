@@ -20,3 +20,4 @@ Route::delete('/todo/{id}', [DashboardController::class, 'destroy'])->name('dash
 Route::post('/dashboard', [TodoController::class, 'store'])->name('todo.store');
 
 Route::post('/todo/update-status', [TodoController::class, 'updateStatus'])->name('todo.update-status');
+Route::post('/dashboard/filter', [DashboardController::class, 'filter'])->name('dashboard.filter');
