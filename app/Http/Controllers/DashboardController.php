@@ -74,4 +74,21 @@ class DashboardController extends Controller
             'filteredTodos' => $filteredTodos,
         ]);
     }
+
+    protected $todoService;
+
+    public function __construct(TodoService $todoService)
+    {
+        $this->todoService = $todoService;
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $todoId = $request->input('todo_id');
+        $status = $request->input('status');
+
+        $this->todoService->updateStatus($todoId, $status);
+
+        return response()->json(['success' => true]);
+    }
 }

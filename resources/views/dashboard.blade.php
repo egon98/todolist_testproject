@@ -1,29 +1,6 @@
 <x-app-layout>
     <h1 class="text-center mt-10 mb-10 text-3xl font-bold mb-4">To-Do List</h1>
 
-    <form id="filter-form">
-        @csrf
-        <div class="flex justify-between mb-4">
-            <div class="w-1/4">
-                <input placeholder="Kategória" name="category" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-            </div>
-            <div class="w-1/4">
-                <select name="priority" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                    <option value="">Prioritás</option>
-                    <option value="Alacsony">Alacsony</option>
-                    <option value="Közepes">Közepes</option>
-                    <option value="Magas">Magas</option>
-                </select>
-            </div>
-            <div class="w-1/4">
-                <input type="date" name="start_date" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-            </div>
-            <div class="w-1/4">
-                <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Szűrés</button>
-            </div>
-        </div>
-    </form>
-
     @if (session('error'))
         <div id="errorMessage" class="bg-red-500 text-white font-bold rounded px-4 py-2 mb-4">
             {{ session('error') }}
@@ -35,6 +12,30 @@
             {{ session('success') }}
         </div>
     @endif
+
+    <form id="filter-form" class="mb-6 max-w-md mx-auto bg-white rounded-lg overflow-hidden md:max-w-xl">
+        @csrf
+        <div class="md:flex justify-between md:space-x-4 p-4">
+            <div class="w-full md:w-1/3 mb-3 md:mb-0">
+                <input placeholder="Kategória" name="category" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div class="w-full md:w-1/3 mb-3 md:mb-0">
+                <select name="priority" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <option value="">Prioritás</option>
+                    <option value="Alacsony">Alacsony</option>
+                    <option value="Közepes">Közepes</option>
+                    <option value="Magas">Magas</option>
+                </select>
+            </div>
+            <div class="w-full md:w-1/3 mb-3 md:mb-0">
+                <input type="date" name="start_date" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <div class="w-full md:w-auto">
+                <button type="submit" class="w-full md:w-auto bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Szűrés</button>
+            </div>
+        </div>
+    </form>
+
 
     <script>
         setTimeout(function() {
@@ -92,64 +93,68 @@
 
 
 
+    @foreach ($todos as $todo)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const filterForm = document.getElementById('filter-form');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const filterForm = document.getElementById('filter-form');
-            const todoList = document.getElementById('todo-list'); // Assuming the table body container
+                filterForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
 
-            filterForm.addEventListener('submit', function (e) {
-                e.preventDefault();
+                    const formData = new FormData(this);
+                    const todoList = document.getElementById('todo-list'); // Assuming the table body container
+                    const todoTableHead = document.getElementById('todoTableHead');
+                    const todoTable = document.getElementById('todoTable');
 
-                const formData = new FormData(this);
-
-                fetch('{{ route('dashboard.filter') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: formData
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.filteredTodos.length === 0) {
-                            todoList.innerHTML = '<tr><td colspan="7" class="text-center">Nincs találat.</td></tr>';
-                        } else {
-                            todoList.innerHTML = ''; // Clear the current content of the table body
-                            data.filteredTodos.forEach(todo => {
-                                const row = document.createElement('tr');
-                                row.innerHTML = `
-                            <td class="text-center border px-4 py-2">${todo['title']}</td>
-                            <td class="text-center border px-4 py-2">${todo['priority']}</td>
-                            <td class="text-center border px-4 py-2">${todo['status']}</td>
-                            <td class="text-center border px-4 py-2">${todo['category']}</td>
-                            <td class="text-center border px-4 py-2">${todo['start_date']}</td>
-                            <td class="text-center border px-4 py-2">${todo['end_date']}</td>
-                            <td class="border px-4 py-2">
-                                <a href="{{ route('dashboard.edit', ' + todo.id + ') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Szerkesztés</a>
-                                <form action="{{ route('dashboard.destroy', ' + todo.id + ') }}" method="POST" class="inline-block">
-                                    @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Törlés</button>
-                            </form>
-                        </td>
-                            `;
-                                todoList.appendChild(row);
-                            });
-                        }
+                    fetch('{{ route('dashboard.filter') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
                     })
-                    .catch(error => console.error('Error:', error));
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.filteredTodos.length === 0) {
+                                todoTableHead.style.display = 'none';
+                                todoTable.style.marginTop = '20px';
+                                todoList.innerHTML = '<tr class="mt-10"><td colspan="7" class="mt-10 text-center">Nincs találat.</td></tr>';
+                            } else {
+                                todoList.innerHTML = ''; // Clear the current content of the table body
+                                data.filteredTodos.forEach(todo => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                    <td class="text-center border px-4 py-2">${todo['title']}</td>
+                                    <td class="text-center border px-4 py-2">${todo['priority']}</td>
+                                    <td class="text-center border px-4 py-2">${todo['status']}</td>
+                                    <td class="text-center border px-4 py-2">${todo['category']}</td>
+                                    <td class="text-center border px-4 py-2">${todo['start_date']}</td>
+                                    <td class="text-center border px-4 py-2">${todo['end_date']}</td>
+                                    <td class="border px-4 py-2">
+                                        <a href="{{ route('dashboard.edit', $todo->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Szerkesztés</a>
+                                        <form action="{{ route('dashboard.destroy', $todo->id) }}" method="POST" class="inline-block">
+                                            @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Törlés</button>
+                                </form>
+                            </td>
+`;
+                                    todoList.appendChild(row);
+                                });
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
             });
-        });
-    </script>
-
+        </script>
+    @endforeach
 
     @if ($todos->isEmpty())
         <p>Nincs még To-Do elem.</p>
     @else
         <div class="overflow-x-auto">
-            <table class="table-auto w-full border-collapse">
-                <thead>
+            <table id="todoTable" class="table-auto w-full border-collapse">
+                <thead id="todoTableHead">
                 <tr>
                     <th class="px-4 py-2">Cím</th>
                     <th class="px-4 py-2">Prioritás</th>
@@ -189,6 +194,4 @@
             </table>
         </div>
     @endif
-
-
 </x-app-layout>
