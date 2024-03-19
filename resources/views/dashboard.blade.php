@@ -1,5 +1,5 @@
 <x-app-layout>
-    <h1 class="text-center mt-10 mb-10 text-3xl font-bold mb-4">To-Do List</h1>
+    <h1 class="text-center mt-10 mb-10 text-3xl font-bold mb-4">To-Do Lista</h1>
 
     @if (session('error'))
         <div id="errorMessage" class="bg-red-500 text-white font-bold rounded px-4 py-2 mb-4">
@@ -12,30 +12,30 @@
             {{ session('success') }}
         </div>
     @endif
-
-    <form id="filter-form" class="mb-6 max-w-md mx-auto bg-white rounded-lg overflow-hidden md:max-w-xl">
-        @csrf
-        <div class="md:flex justify-between md:space-x-4 p-4">
-            <div class="w-full md:w-1/3 mb-3 md:mb-0">
-                <input placeholder="Kategória" name="category" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+    @if (!$todos->isEmpty())
+        <form id="filter-form" class="mb-6 max-w-md mx-auto bg-white rounded-lg overflow-hidden md:max-w-xl">
+            @csrf
+            <div class="md:flex justify-between md:space-x-4 p-4">
+                <div class="w-full md:w-1/3 mb-3 md:mb-0">
+                    <input placeholder="Kategória" name="category" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                </div>
+                <div class="w-full md:w-1/3 mb-3 md:mb-0">
+                    <select name="priority" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        <option value="">Prioritás</option>
+                        <option value="Alacsony">Alacsony</option>
+                        <option value="Közepes">Közepes</option>
+                        <option value="Magas">Magas</option>
+                    </select>
+                </div>
+                <div class="w-full md:w-1/3 mb-3 md:mb-0">
+                    <input type="date" name="start_date" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                </div>
+                <div class="w-full md:w-auto">
+                    <button type="submit" class="w-full md:w-auto bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Szűrés</button>
+                </div>
             </div>
-            <div class="w-full md:w-1/3 mb-3 md:mb-0">
-                <select name="priority" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                    <option value="">Prioritás</option>
-                    <option value="Alacsony">Alacsony</option>
-                    <option value="Közepes">Közepes</option>
-                    <option value="Magas">Magas</option>
-                </select>
-            </div>
-            <div class="w-full md:w-1/3 mb-3 md:mb-0">
-                <input type="date" name="start_date" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-            </div>
-            <div class="w-full md:w-auto">
-                <button type="submit" class="w-full md:w-auto bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Szűrés</button>
-            </div>
-        </div>
-    </form>
-
+        </form>
+    @endif
 
     <script>
         setTimeout(function() {
@@ -150,7 +150,7 @@
     @endforeach
 
     @if ($todos->isEmpty())
-        <p>Nincs még To-Do elem.</p>
+        <p class="text-center">Nincs még To-Do elem.</p>
     @else
         <div class="overflow-x-auto">
             <table id="todoTable" class="table-auto w-full border-collapse">
@@ -174,7 +174,7 @@
                             <select class="status-select text-center bg-white border rounded px-3 pr-8 py-1" data-todo-id="{{ $todo->id }}">
                                 <option value="Aktív" {{ $todo->status === 'Aktív' ? 'selected' : '' }}>Aktív</option>
                                 <option value="Befejezett" {{ $todo->status === 'Befejezett' ? 'selected' : '' }}>Befejezett</option>
-                                <option value="Halasztott" {{ $todo->status === 'Halasztott' ? 'selected' : '' }}>Halasztott</option>
+                                <option value="Elhalasztott" {{ $todo->status === 'Elhalasztott' ? 'selected' : '' }}>Halasztott</option>
                             </select>
                         </td>
                         <td class="text-center border px-4 py-2">{{ $todo->category }}</td>

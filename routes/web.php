@@ -10,7 +10,6 @@ Route::get('/', function () {
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/todo', [TodoController::class, 'index'])->name('todo.index');
     Route::get('/todo/create', [TodoController::class, 'create'])->name('todo.create');
     Route::get('/todo/{id}/edit', [DashboardController::class, 'edit'])->name('dashboard.edit');
     Route::put('/todo/{id}', [DashboardController::class, 'update'])->name('dashboard.update');
