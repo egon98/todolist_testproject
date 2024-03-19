@@ -32,10 +32,18 @@ class DashboardController extends Controller
             'end_date' => 'required|date',
         ]);
 
-        $todo = Todo::findOrFail($id);
-        $todo->update($request->all());
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        return redirect()->route('dashboard')->with('success', 'A To-Do elem sikeresen frissítve lett.');
+        if ($startDate < $endDate) {
+            $todo = Todo::findOrFail($id);
+            $todo->update($request->all());
+
+            return redirect()->route('dashboard')->with('success', 'A To-Do elem sikeresen frissítve lett.');
+        } else {
+            $todo = Todo::findOrFail($id);
+            return redirect()->route('dashboard.edit', $todo->id)->with('error', 'A kezdés dátuma későbbi, mint a befejezés dátuma!');
+        }
     }
 
     public function destroy(Request $request, $id): RedirectResponse

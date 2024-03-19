@@ -1,7 +1,23 @@
 <x-app-layout>
+
+    <script>
+        setTimeout(function() {
+            var errorMessage = document.getElementById('errorMessage');
+            if (errorMessage) {
+                errorMessage.remove();
+            }
+        }, 5000);
+    </script>
+
     <form action="{{ route('dashboard.update', $todo->id) }}" method="POST" class="max-w-md mx-auto mt-8">
         @csrf
         @method('PUT')
+
+        @if (session('error'))
+            <div id="errorMessage" class="bg-red-500 text-white font-bold rounded px-4 py-2 mb-4">
+                {{ session('error') }}
+            </div>
+        @endif
 
         <div class="mb-4">
             <label for="title" class="block text-sm font-medium text-gray-700">Cím:</label>

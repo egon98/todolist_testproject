@@ -27,12 +27,19 @@ class TodoController extends Controller
             'status' => 'required',
             'category' => 'required',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
+            'end_date' => 'required|date',
         ]);
 
-        Todo::create($request->all());
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        return redirect()->route('dashboard')->with('success', 'To-Do hozzáadva!');
+
+        if ($startDate < $endDate) {
+            Todo::create($request->all());
+            return redirect()->route('dashboard')->with('success', 'To-Do hozzáadva!');
+        } else {
+            return redirect()->route('todo.create')->with('error', 'A kezdés dátuma későbbi, mint a befejezés dátuma!');
+        }
     }
 
     protected $todoService;
