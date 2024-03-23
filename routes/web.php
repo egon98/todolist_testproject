@@ -11,11 +11,11 @@ Route::get('/', function () {
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/todo/create', [TodoController::class, 'create'])->name('todo.create');
-    Route::get('/todo/{id}/edit', [DashboardController::class, 'edit'])->name('dashboard.edit');
-    Route::put('/todo/{id}', [DashboardController::class, 'update'])->name('dashboard.update');
-    Route::delete('/todo/{id}', [DashboardController::class, 'destroy'])->name('dashboard.destroy');
+    Route::get('/todo/{id}/edit', [TodoController::class, 'edit'])->name('todo.edit');
+    Route::put('/todo/{id}', [TodoController::class, 'update'])->name('todo.update');
+    Route::delete('/todo/{id}', [TodoController::class, 'destroy'])->name('todo.destroy');
     Route::post('/dashboard', [TodoController::class, 'store'])->name('todo.store');
     Route::post('/todo/update-status', [TodoController::class, 'updateStatus'])->name('todo.update-status');
-    Route::post('/dashboard/filter', [DashboardController::class, 'filter'])->name('dashboard.filter');
-    Route::post('/dashboard/filter/update-status', [DashboardController::class, 'updateStatus'])->name('dashboard.update-status');
+    Route::post('/todo/filter', [TodoController::class, 'filter'])->name('todo.filter');
+    Route::post('/todo/filter/update-status', [TodoController::class, 'updateStatus'])->name('todo.update-status');
 });

@@ -9,7 +9,7 @@
         }, 5000);
     </script>
 
-    <form action="{{ route('dashboard.update', $todo->id) }}" method="POST" class="max-w-md mx-auto mt-8">
+    <form action="{{ route('todo.update', $todo->id) }}" method="POST" class="max-w-md mx-auto mt-8">
         @csrf
         @method('PUT')
 

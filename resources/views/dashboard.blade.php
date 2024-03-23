@@ -50,46 +50,7 @@
         }, 5000);
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const statusSelects = document.querySelectorAll('.status-select');
-
-            statusSelects.forEach(select => {
-                select.addEventListener('change', function () {
-                    const todoId = this.dataset.todoId;
-                    const status = this.value;
-
-                    fetch('/todo/update-status', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({
-                            todo_id: todoId,
-                            status: status
-                        })
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                alert('Feladat állapota frissítve!');
-                            } else {
-                                throw new Error('Failed to update status');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                });
-            });
-        });
-    </script>
+    <script src="{{ asset('js/todo_update_status.js') }}"></script>
 
 
 
@@ -106,7 +67,7 @@
                     const todoTableHead = document.getElementById('todoTableHead');
                     const todoTable = document.getElementById('todoTable');
 
-                    fetch('{{ route('dashboard.filter') }}', {
+                    fetch('{{ route('todo.filter') }}', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -123,22 +84,72 @@
                                 todoList.innerHTML = ''; // Clear the current content of the table body
                                 data.filteredTodos.forEach(todo => {
                                     const row = document.createElement('tr');
-                                    row.innerHTML = `
-                                    <td class="text-center border px-4 py-2">${todo['title']}</td>
-                                    <td class="text-center border px-4 py-2">${todo['priority']}</td>
-                                    <td class="text-center border px-4 py-2">${todo['status']}</td>
-                                    <td class="text-center border px-4 py-2">${todo['category']}</td>
-                                    <td class="text-center border px-4 py-2">${todo['start_date']}</td>
-                                    <td class="text-center border px-4 py-2">${todo['end_date']}</td>
-                                    <td class="border px-4 py-2">
-                                        <a href="{{ route('dashboard.edit', $todo->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Szerkesztés</a>
-                                        <form action="{{ route('dashboard.destroy', $todo->id) }}" method="POST" class="inline-block">
-                                            @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Törlés</button>
-                                </form>
-                            </td>
-`;
+
+                                    const titleCell = document.createElement('td');
+                                    titleCell.className = 'text-center border px-4 py-2';
+                                    titleCell.textContent = todo['title'];
+                                    row.appendChild(titleCell);
+
+                                    const priorityCell = document.createElement('td');
+                                    priorityCell.className = 'text-center border px-4 py-2';
+                                    priorityCell.textContent = todo['priority'];
+                                    row.appendChild(priorityCell);
+
+                                    const statusCell = document.createElement('td');
+                                    statusCell.className = 'text-center border px-4 py-2';
+                                    statusCell.textContent = todo['status'];
+                                    row.appendChild(statusCell);
+
+                                    const categoryCell = document.createElement('td');
+                                    categoryCell.className = 'text-center border px-4 py-2';
+                                    categoryCell.textContent = todo['category'];
+                                    row.appendChild(categoryCell);
+
+                                    const startDateCell = document.createElement('td');
+                                    startDateCell.className = 'text-center border px-4 py-2';
+                                    startDateCell.textContent = todo['start_date'];
+                                    row.appendChild(startDateCell);
+
+                                    const endDateCell = document.createElement('td');
+                                    endDateCell.className = 'text-center border px-4 py-2';
+                                    endDateCell.textContent = todo['end_date'];
+                                    row.appendChild(endDateCell);
+
+                                    const actionCell = document.createElement('td');
+                                    actionCell.className = 'border px-4 py-2';
+
+                                    const editLink = document.createElement('a');
+                                    editLink.href = '{{ route('todo.edit', $todo->id) }}';
+                                    editLink.className = 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded';
+                                    editLink.textContent = 'Szerkesztés';
+                                    actionCell.appendChild(editLink);
+
+                                    const deleteForm = document.createElement('form');
+                                    deleteForm.action = '{{ route('todo.destroy', $todo->id) }}';
+                                    deleteForm.method = 'POST';
+                                    deleteForm.className = 'inline-block';
+
+                                    const csrfTokenInput = document.createElement('input');
+                                    csrfTokenInput.type = 'hidden';
+                                    csrfTokenInput.name = '_token';
+                                    csrfTokenInput.value = '{{ csrf_token() }}';
+                                    deleteForm.appendChild(csrfTokenInput);
+
+                                    const methodInput = document.createElement('input');
+                                    methodInput.type = 'hidden';
+                                    methodInput.name = '_method';
+                                    methodInput.value = 'DELETE';
+                                    deleteForm.appendChild(methodInput);
+
+                                    const deleteButton = document.createElement('button');
+                                    deleteButton.type = 'submit';
+                                    deleteButton.className = 'bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded';
+                                    deleteButton.textContent = 'Törlés';
+                                    deleteForm.appendChild(deleteButton);
+
+                                    actionCell.appendChild(deleteForm);
+                                    row.appendChild(actionCell);
+
                                     todoList.appendChild(row);
                                 });
                             }
@@ -181,8 +192,8 @@
                         <td class="text-center border px-4 py-2">{{ $todo->start_date }}</td>
                         <td class="text-center border px-4 py-2">{{ $todo->end_date }}</td>
                         <td class="border px-4 py-2">
-                            <a href="{{ route('dashboard.edit', $todo->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Szerkesztés</a>
-                            <form action="{{ route('dashboard.destroy', $todo->id) }}" method="POST" class="inline-block">
+                            <a href="{{ route('todo.edit', $todo->id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Szerkesztés</a>
+                            <form action="{{ route('todo.destroy', $todo->id) }}" method="POST" class="inline-block">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Törlés</button>
